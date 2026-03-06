@@ -1,0 +1,38 @@
+/* EXZENT Pixel Hover – Editor Block Placeholder */
+
+.exzent-pixel-hover-editor-block {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-left: 3px solid #e05a2b;
+    font-family: 'Space Mono', monospace;
+    user-select: none;
+    cursor: default;
+}
+
+.exzent-pixel-hover-icon {
+    font-size: 18px;
+    color: #e05a2b;
+    line-height: 1;
+}
+
+.exzent-pixel-hover-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #ccc;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.exzent-pixel-hover-target {
+    font-size: 11px;
+    color: #666;
+    font-family: monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

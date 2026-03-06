@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Hover – EXZENT Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0ede8;
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    padding: 60px 40px;
+    flex-wrap: wrap;
+  }
+
+  .demo-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 20px;
+  }
+
+  .link-list {
+    width: 300px;
+    border-top: 1px solid #222;
+  }
+
+  .link-list a {
+    text-decoration: none;
+    padding: 13px 0;
+    border-bottom: 1px solid #222;
+    width: 100%;
+    display: block;
+    position: relative;
+    overflow: hidden;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  .link-list a canvas.pixel-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    display: block;
+  }
+
+  .link-list a span {
+    position: relative;
+    z-index: 2;
+    display: block;
+    color: #222;
+  }
+
+  /* ─── Panel ─────────────────────────────────── */
+  .panel {
+    width: 290px;
+    background: #1a1a1a;
+    color: #ccc;
+    border-radius: 2px;
+    overflow: hidden;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .panel-header {
+    background: #111;
+    padding: 12px 16px;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .panel-header::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: #e05a2b;
+    border-radius: 50%;
+  }
+
+  .panel-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .section-title {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #555;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #2a2a2a;
+  }
+
+  .divider {
+    height: 1px;
+    background: #2a2a2a;
+    margin: 0 -16px;
+  }
+
+  .control {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .control-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .control label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #888;
+  }
+
+  .value-badge {
+    font-size: 11px;
+    color: #e05a2b;
+    font-weight: 700;
+    min-width: 44px;
+    text-align: right;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 2px;
+    background: #333;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px; height: 12px;
+    background: #e05a2b;
+    cursor: pointer;
+    border-radius: 0;
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 12px; height: 12px;
+    background: #e05a2b;
+    cursor: pointer;
+    border-radius: 0;
+    border: none;
+  }
+
+  /* Color input */
+  .color-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .color-control label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #888;
+    flex: 1;
+  }
+
+  input[type="color"] {
+    -webkit-appearance: none;
+    width: 32px; height: 20px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+  input[type="color"]::-webkit-color-swatch {
+    border: 1px solid #444;
+    border-radius: 0;
+  }
+
+  /* Direction dial */
+  .dir-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .dir-control .sliders {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .dial-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .dial {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1.5px solid #333;
+    background: #111;
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .dial-arrow {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 2px;
+    height: 16px;
+    background: #e05a2b;
+    transform-origin: bottom center;
+    transform: translate(-50%, -100%) rotate(0deg);
+    border-radius: 1px;
+  }
+
+  .dial-dot {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 4px; height: 4px;
+    background: #555;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .dial-val {
+    font-size: 10px;
+    color: #e05a2b;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  /* Toggle */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .toggle-label {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #666;
+  }
+
+  .toggle {
+    position: relative;
+    width: 30px;
+    height: 16px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .toggle input { display: none; }
+
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: #2e2e2e;
+    border: 1px solid #3a3a3a;
+    border-radius: 0;
+    transition: background 0.15s;
+  }
+
+  .toggle-thumb {
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 10px; height: 10px;
+    background: #555;
+    border-radius: 0;
+    transition: transform 0.15s, background 0.15s;
+  }
+
+  .toggle input:checked ~ .toggle-track { background: #2a1a0e; border-color: #e05a2b; }
+  .toggle input:checked ~ .toggle-thumb { transform: translateX(14px); background: #e05a2b; }
+
+  /* dim manual controls when auto mode active */
+  .dir-manual.dimmed {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  /* live angle flash on the dial when auto */
+  .dial.auto-active { border-color: #e05a2b44; }
+  .dial-arrow.auto-flash {
+    transition: transform 0.12s ease-out;
+  }
+</style>
+</head>
+<body>
+
+<div>
+  <p class="demo-label">Pixel Hover Effect</p>
+  <nav class="link-list" id="linkList">
+    <a href="#"><span>Webdesign</span></a>
+    <a href="#"><span>Corporate Design</span></a>
+    <a href="#"><span>UX/UI Design</span></a>
+    <a href="#"><span>Barrierefreie Website</span></a>
+    <a href="#"><span>Firmenwebsite</span></a>
+    <a href="#"><span>KI/AI Webdesign</span></a>
+    <a href="#"><span>SaaS Entwicklung</span></a>
+  </nav>
+</div>
+
+<div class="panel">
+  <div class="panel-header">Config</div>
+  <div class="panel-body">
+
+    <span class="section-title">Farbe</span>
+
+    <div class="color-control">
+      <label>Pixel Color</label>
+      <input type="color" id="cfg-color" value="#222222">
+      <span class="value-badge" id="cfg-color-hex">#222222</span>
+    </div>
+
+    <div class="divider"></div>
+    <span class="section-title">Grid</span>
+
+    <div class="control">
+      <div class="control-row">
+        <label>Rows</label>
+        <span class="value-badge" id="val-rows">6</span>
+      </div>
+      <input type="range" id="cfg-rows" min="2" max="16" step="1" value="6">
+    </div>
+
+    <div class="divider"></div>
+    <span class="section-title">Animation</span>
+
+    <div class="control">
+      <div class="control-row">
+        <label>Exit Duration</label>
+        <span class="value-badge" id="val-exitDuration">380ms</span>
+      </div>
+      <input type="range" id="cfg-exitDuration" min="80" max="1200" step="10" value="380">
+    </div>
+
+    <div class="control">
+      <div class="control-row">
+        <label>Color Fade</label>
+        <span class="value-badge" id="val-colorFade">100%</span>
+      </div>
+      <input type="range" id="cfg-colorFade" min="0" max="100" step="5" value="100">
+    </div>
+
+    <div class="control">
+      <div class="control-row">
+        <label>Random Chaos</label>
+        <span class="value-badge" id="val-randomWeight">45%</span>
+      </div>
+      <input type="range" id="cfg-randomWeight" min="0" max="100" step="5" value="45">
+    </div>
+
+    <!-- Direction: slider + Dial -->
+    <div class="control">
+      <div class="control-row">
+        <label>Bias Richtung</label>
+        <div class="toggle-row">
+          <span class="toggle-label" id="auto-mode-label">Auto&nbsp;Exit</span>
+          <label class="toggle">
+            <input type="checkbox" id="cfg-autoAngle">
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </label>
+        </div>
+      </div>
+      <div class="dir-manual" id="dir-manual">
+        <div class="dir-control">
+          <div class="sliders">
+          <div class="control-row">
+            <label style="font-size:9px;color:#666;">Stärke</label>
+            <span class="value-badge" id="val-staggerBase">55%</span>
+          </div>
+          <input type="range" id="cfg-staggerBase" min="0" max="100" step="5" value="55">
+          <div class="control-row" style="margin-top:6px;">
+            <label style="font-size:9px;color:#666;">Winkel</label>
+            <span class="value-badge" id="val-biasAngle">0°</span>
+          </div>
+          <input type="range" id="cfg-biasAngle" min="0" max="359" step="1" value="0">
+        </div>
+        <div class="dial-wrap">
+          <div class="dial" id="dial">
+            <div class="dial-arrow" id="dial-arrow"></div>
+            <div class="dial-dot"></div>
+          </div>
+          <span class="dial-val" id="dial-label">→</span>
+        </div>
+      </div>
+      </div><!-- /dir-manual -->
+    </div>
+
+    <div class="divider"></div>
+    <span class="section-title">Cluster</span>
+
+    <div class="control">
+      <div class="control-row">
+        <label>2×2 Double Pixel</label>
+        <span class="value-badge" id="val-doublePct">0%</span>
+      </div>
+      <input type="range" id="cfg-doublePct" min="0" max="100" step="5" value="0">
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const CONFIG = {
+  color:        '#222222',
+  rows:         6,
+  exitDuration: 380,
+  colorFade:    1.0,
+  randomWeight: 0.45,
+  staggerBase:  0.55,
+  biasAngle:    0,
+  doublePct:    0,
+  autoAngle:    false,  // Mouse-Exit-Winkel automatisch bestimmen
+};
+
+// ─── PIXEL HOVER ──────────────────────────────────────────────────────────────
+function initPixelHover(link) {
+  const canvas = document.createElement('canvas');
+  canvas.classList.add('pixel-layer');
+  link.insertBefore(canvas, link.firstChild);
+  const ctx  = canvas.getContext('2d');
+  const span = link.querySelector('span');
+
+  let cells = [], cols = 0, rows = 0, raf = null;
+  let hovered = false, cellW = 0, cellH = 0;
+  let lastMouseX = 0, lastMouseY = 0;
+
+  // Track mouse position within link for exit-angle calc
+  link.addEventListener('mousemove', e => {
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+  });
+
+  function build() {
+    const rect = link.getBoundingClientRect();
+    canvas.width  = rect.width;
+    canvas.height = rect.height;
+    rows  = CONFIG.rows;
+    cellH = canvas.height / rows;
+    cellW = cellH;
+    cols  = Math.ceil(canvas.width / cellW);
+
+    // Grid als 2D Array für Cluster-Lookup
+    const grid = [];
+    cells = [];
+    for (let r = 0; r < rows; r++) {
+      grid[r] = [];
+      for (let c = 0; c < cols; c++) {
+        const cell = { x: c * cellW, y: r * cellH, col: c, row: r, visible: false, hideAt: 0 };
+        grid[r][c] = cell;
+        cells.push(cell);
+      }
+    }
+    return grid;
+  }
+
+  function render(now) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = CONFIG.color;
+    let anyVisible = false;
+    for (const cell of cells) {
+      if (!cell.visible) continue;
+      if (now >= cell.hideAt) { cell.visible = false; continue; }
+      ctx.fillRect(cell.x, cell.y, cellW, cellH);
+      anyVisible = true;
+    }
+    if (anyVisible) raf = requestAnimationFrame(render);
+  }
+
+  link.addEventListener('mouseenter', () => {
+    hovered = true;
+    cancelAnimationFrame(raf);
+    build();
+    ctx.fillStyle = CONFIG.color;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    for (const cell of cells) { cell.visible = true; cell.hideAt = Infinity; }
+    span.style.transition = 'color 0s';
+    span.style.color = '#fff';
+  });
+
+  link.addEventListener('mouseleave', e => {
+    hovered = false;
+
+    // Auto-Winkel: Austrittsposition → Winkel vom Zentrum aus
+    if (CONFIG.autoAngle) {
+      const rect = link.getBoundingClientRect();
+      const cx = rect.left + rect.width  / 2;
+      const cy = rect.top  + rect.height / 2;
+      // exitX/Y: letzte bekannte Mauspos (clientX/Y vom mouseleave event ist zuverlässiger)
+      const ex = e.clientX - cx;
+      const ey = e.clientY - cy;
+      // Winkel vom Zentrum zur Austrittsseite (0°=rechts, CCW)
+      // +180° damit Pixel auf der Austrittsseite zuerst verschwinden
+      const rawDeg = Math.atan2(-ey, ex) * (180 / Math.PI);
+      const exitAngle = (rawDeg % 360 + 360) % 360;
+      setAngle(exitAngle);
+    }
+
+    const now = performance.now();
+    const dur = CONFIG.exitDuration;
+
+    // Richtungsvektor aus biasAngle
+    // Angle 0° = bias kommt von rechts → rechte Zellen verschwinden früher
+    // Wir projizieren jede Zelle auf den normierten Richtungsvektor
+    const rad = (CONFIG.biasAngle * Math.PI) / 180;
+    const dx  = Math.cos(rad);   // +1 = Richtung rechts
+    const dy  = -Math.sin(rad);  // +1 = Richtung oben (Canvas y invertiert)
+
+    // Projektionswerte berechnen (roh, nicht normiert)
+    let minProj = Infinity, maxProj = -Infinity;
+    for (const cell of cells) {
+      const nx = (cell.col + 0.5) / cols;
+      const ny = (cell.row + 0.5) / rows;
+      const proj = nx * dx + ny * dy;
+      cell._proj = proj;
+      if (proj < minProj) minProj = proj;
+      if (proj > maxProj) maxProj = proj;
+    }
+    const projRange = maxProj - minProj || 1;
+
+    // Basis-hideAt pro Zelle
+    for (const cell of cells) {
+      const normalized = (cell._proj - minProj) / projRange; // 0=früh, 1=spät
+      const dirDelay  = normalized * dur * CONFIG.staggerBase;
+      const randDelay = Math.random() * dur * CONFIG.randomWeight;
+      cell.hideAt = now + dirDelay + randDelay;
+    }
+
+    // 2×2 Cluster: benachbarte Zellen zusammenfassen
+    if (CONFIG.doublePct > 0) {
+      // Cluster-Flags zurücksetzen
+      for (const cell of cells) cell._clustered = false;
+
+      // Alle 2×2-Startpositionen shufflen für fairen Zufall
+      const positions = [];
+      for (let r = 0; r <= rows - 2; r++) {
+        for (let c = 0; c <= cols - 2; c++) {
+          positions.push([r, c]);
+        }
+      }
+      // Fisher-Yates shuffle für unbiased Cluster-Verteilung
+      for (let i = positions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [positions[i], positions[j]] = [positions[j], positions[i]];
+      }
+
+      // Rebuild grid reference for cluster lookup
+      const grid = [];
+      for (let r = 0; r < rows; r++) {
+        grid[r] = [];
+        for (let c = 0; c < cols; c++) {
+          grid[r][c] = cells.find(cell => cell.row === r && cell.col === c);
+        }
+      }
+
+      for (const [r, c] of positions) {
+        if (Math.random() > CONFIG.doublePct) continue;
+        const c00 = grid[r]?.[c];
+        const c01 = grid[r]?.[c + 1];
+        const c10 = grid[r + 1]?.[c];
+        const c11 = grid[r + 1]?.[c + 1];
+        if (!c00 || !c01 || !c10 || !c11) continue;
+        if (c00._clustered || c01._clustered || c10._clustered || c11._clustered) continue;
+
+        // Alle 4 Zellen bekommen das mittlere hideAt des Clusters
+        const avgHideAt = (c00.hideAt + c01.hideAt + c10.hideAt + c11.hideAt) / 4;
+        c00.hideAt = c01.hideAt = c10.hideAt = c11.hideAt = avgHideAt;
+        c00._clustered = c01._clustered = c10._clustered = c11._clustered = true;
+      }
+    }
+
+    // Textfarbe sanft zurückfaden
+    const fadeDur = Math.round(dur * CONFIG.colorFade);
+    span.style.transition = `color ${fadeDur}ms ease`;
+    span.style.color = '#222';
+
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(render);
+  });
+}
+
+document.querySelectorAll('#linkList a').forEach(initPixelHover);
+
+// ─── SETTINGS PANEL ───────────────────────────────────────────────────────────
+function bindRange(id, key, badgeId, format) {
+  const input = document.getElementById(id);
+  const badge = document.getElementById(badgeId);
+  if (!input) return;
+  input.addEventListener('input', () => {
+    const raw = parseFloat(input.value);
+    CONFIG[key] = (format === 'pct') ? raw / 100 : raw;
+    badge.textContent = format === 'ms'  ? raw + 'ms'
+                      : format === 'pct' ? raw + '%'
+                      : format === 'deg' ? raw + '°'
+                      : raw;
+  });
+}
+
+bindRange('cfg-rows',         'rows',         'val-rows',         'int');
+bindRange('cfg-exitDuration', 'exitDuration', 'val-exitDuration', 'ms');
+bindRange('cfg-colorFade',    'colorFade',    'val-colorFade',    'pct');
+bindRange('cfg-randomWeight', 'randomWeight', 'val-randomWeight', 'pct');
+bindRange('cfg-staggerBase',  'staggerBase',  'val-staggerBase',  'pct');
+bindRange('cfg-doublePct',    'doublePct',    'val-doublePct',    'pct');
+
+document.getElementById('cfg-color').addEventListener('input', e => {
+  CONFIG.color = e.target.value;
+  document.getElementById('cfg-color-hex').textContent = e.target.value.toUpperCase();
+});
+
+// ─── AUTO ANGLE TOGGLE ────────────────────────────────────────────────────────
+const autoToggle  = document.getElementById('cfg-autoAngle');
+const dirManual   = document.getElementById('dir-manual');
+
+autoToggle.addEventListener('change', () => {
+  CONFIG.autoAngle = autoToggle.checked;
+  dirManual.classList.toggle('dimmed', CONFIG.autoAngle);
+});
+
+// ─── DIAL ─────────────────────────────────────────────────────────────────────
+const dial      = document.getElementById('dial');
+const dialArrow = document.getElementById('dial-arrow');
+const dialLabel = document.getElementById('dial-label');
+const angleSlider = document.getElementById('cfg-biasAngle');
+const angleVal    = document.getElementById('val-biasAngle');
+
+const COMPASS = ['→', '↗', '↑', '↖', '←', '↙', '↓', '↘'];
+
+function setAngle(deg) {
+  deg = ((deg % 360) + 360) % 360;
+  CONFIG.biasAngle = deg;
+
+  // Arrow: zeigt in Bias-Richtung (wo Pixel zuletzt verschwinden = "Herkunft" des Wipe)
+  // Angle 0 = bias von rechts → Pfeil zeigt rechts → rotate(90deg) in CSS (oben = 0°)
+  dialArrow.style.transform = `translate(-50%, -100%) rotate(${deg}deg)`;
+  angleSlider.value  = deg;
+  angleVal.textContent = deg + '°';
+
+  const compassIdx = Math.round(deg / 45) % 8;
+  dialLabel.textContent = COMPASS[compassIdx];
+}
+
+setAngle(0);
+
+// Slider → Dial
+angleSlider.addEventListener('input', () => setAngle(parseFloat(angleSlider.value)));
+
+// Drag auf Dial
+let dragging = false;
+dial.addEventListener('mousedown', e => { dragging = true; e.preventDefault(); });
+document.addEventListener('mouseup',   () => { dragging = false; });
+document.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  const rect   = dial.getBoundingClientRect();
+  const cx     = rect.left + rect.width / 2;
+  const cy     = rect.top  + rect.height / 2;
+  const dx     = e.clientX - cx;
+  const dy     = e.clientY - cy;
+  // atan2 gibt Winkel ab 3-Uhr-Position, wir wollen 12-Uhr = 0°
+  let deg = Math.atan2(dx, -dy) * (180 / Math.PI);
+  setAngle(Math.round(deg));
+});
+
+// Touch-Support
+dial.addEventListener('touchstart', e => { dragging = true; e.preventDefault(); }, { passive: false });
+document.addEventListener('touchend', () => { dragging = false; });
+document.addEventListener('touchmove', e => {
+  if (!dragging) return;
+  const touch  = e.touches[0];
+  const rect   = dial.getBoundingClientRect();
+  const cx     = rect.left + rect.width / 2;
+  const cy     = rect.top  + rect.height / 2;
+  const dx     = touch.clientX - cx;
+  const dy     = touch.clientY - cy;
+  let deg = Math.atan2(dx, -dy) * (180 / Math.PI);
+  setAngle(Math.round(deg));
+}, { passive: false });
+</script>
+</body>
+</html>
