@@ -1,5 +1,7 @@
 # Pixel Hover
 
+**Live demo:** https://exzenter.github.io/pixel-hover/
+
 This repository contains a simple HTML mockup demonstrating a pixel hover effect.
 
 ## Preview
